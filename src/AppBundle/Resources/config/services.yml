@@ -1,0 +1,39 @@
+services:
+      appbundle.util.inflector:
+           class: AppBundle\Util\Inflector\NoopInflector
+
+      # -- REPOSITORY --
+      appbundle.repository.user_repository:
+          class: AppBundle\Repository\UserRepository
+          factory: ["@doctrine", getRepository]
+          arguments:
+              - AppBundle\Entity\User
+
+      appbundle.repository.task_repository:
+          class: AppBundle\Repository\TaskRepository
+          factory: ["@doctrine", getRepository]
+          arguments:
+              - AppBundle\Entity\Task
+
+      # -- FORM --
+      appbundle.form.type.task:
+          class: AppBundle\Form\Type\TaskType
+          arguments:
+              - "@appbundle.repository.user_repository"
+          tags:
+              - { name: form.type, alias: task_form }
+
+      appbundle.form.handler.task_form_handler:
+          class: AppBundle\Form\Handler\FormHandler
+          arguments:
+              - "@form.factory"
+              - "@appbundle.form.type.task"
+
+      # -- HANDLER --
+      appbundle.handler.task_handler:
+          class: AppBundle\Handler\TaskHandler
+          arguments:
+              - "@appbundle.form.handler.task_form_handler"
+              - "@appbundle.repository.task_repository"
+
+
