@@ -1,0 +1,4 @@
+todos:
+    resource: AppBundle\Controller\TodoController
+    type: rest
+    prefix: /api

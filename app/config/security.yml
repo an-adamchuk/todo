@@ -1,0 +1,47 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/book/security.html
+security:
+    encoders:
+        FOS\UserBundle\Model\UserInterface: sha512
+
+    providers:
+        fos_userbundle:
+            id: fos_user.user_provider.username_email
+
+    firewalls:
+        api_docs:
+            pattern: ^/doc
+            anonymous: true
+        dev:
+            pattern: ^/{_{profiler|wdt}}/
+            security: false
+            switch_user: true
+        api_login:
+            pattern:    ^/api/login
+            stateless:  true
+            anonymous:  true
+            logout:     false
+            provider:   fos_userbundle
+            form_login:
+                check_path:               api_login_check
+                require_previous_session: false
+                username_parameter:       username
+                password_parameter:       password
+                success_handler:          lexik_jwt_authentication.handler.authentication_success
+                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+        api:
+            pattern:    ^/api
+            stateless:  true
+            provider:   fos_userbundle
+            lexik_jwt:
+                authorization_header:
+                    enabled: true
+                    prefix:  Bearer
+                query_parameter:
+                    enabled: true
+                    name:    bearer
+
+    access_control:
+        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/doc,   roles: IS_AUTHENTICATED_ANONYMOUSLY }
